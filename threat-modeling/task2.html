@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threat Modeling Analysis</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Threat Modeling Analysis Form</h2>
+    <form id="dreadForm">
+      <label for="threat">Select Threat:</label>
+      <select id="threat" required>
+        <option value="">Choose a Threat</option>
+        <option value="Spoofing pada Aplikasi Web Front-End">Spoofing pada Aplikasi Web Front-End</option>
+        <option value="Tampering pada Server Backend">Tampering pada Server Backend</option>
+        <option value="Information Disclosure pada Database Enkripsi">Information Disclosure pada Database Enkripsi</option>
+        <option value="Elevation of Privilege pada Layanan API Internal">Elevation of Privilege pada Layanan API Internal</option>
+        <option value="Denial of Service pada Modul Autentikasi">Denial of Service pada Modul Autentikasi</option>
+        <option value="Repudiation pada Sistem Pembayaran">Repudiation pada Sistem Pembayaran</option>
+      </select>
+
+      <div class="input-group">
+        <label>Damage:</label>
+        <input type="number" id="damage" min="0" max="10" required>
+      </div>
+      <div class="input-group">
+        <label>Reproducibility:</label>
+        <input type="number" id="reproducibility" min="0" max="10" required>
+      </div>
+      <div class="input-group">
+        <label>Exploitability:</label>
+        <input type="number" id="exploitability" min="0" max="10" required>
+      </div>
+      <div class="input-group">
+        <label>Affected Users:</label>
+        <input type="number" id="affectedUsers" min="0" max="10" required>
+      </div>
+      <div class="input-group">
+        <label>Discoverability:</label>
+        <input type="number" id="discoverability" min="0" max="10" required>
+      </div>
+
+      <button type="submit">Analyze</button>
+    </form>
+
+    <div id="chartContainer">
+      <canvas id="dreadChart"></canvas>
+    </div>
+    
+    <div id="analysisResult"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

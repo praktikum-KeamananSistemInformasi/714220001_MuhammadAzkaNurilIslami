@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Encryption and Hashing</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        background-color: #f0f4f8;
+        color: #333;
+      }
+      h1 {
+        text-align: center;
+        color: #4caf50;
+        margin-top: 20px;
+        font-size: 2em;
+      }
+      .container {
+        max-width: 700px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      textarea,
+      input,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1em;
+        transition: border-color 0.3s;
+      }
+
+      textarea:focus,
+      input:focus,
+      select:focus {
+        border-color: #4caf50;
+        outline: none;
+      }
+      button {
+        display: inline-block;
+        width: 100%;
+        padding: 12px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s;
+      }
+      button:last-child {
+        margin-top: 10px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #algorithmInfo {
+        margin: 10px 0;
+        background-color: #e8f5e9;
+        padding: 15px;
+        border-radius: 5px;
+        font-size: 0.9em;
+        color: #2e7d32;
+      }
+      h3 {
+        margin-top: 20px;
+        font-size: 1.2em;
+        color: #555;
+      }
+      p {
+        background: #f9f9f9;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        word-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Text Encryption and Hashing</h1>
+
+      <div>
+        <label for="plainText">Enter Plain Text:</label>
+        <textarea
+          id="plainText"
+          placeholder="Type your text here..."
+        ></textarea>
+      </div>
+
+      <div>
+        <label for="algorithm">Choose Algorithm:</label>
+        <select id="algorithm" onchange="updateAlgorithmInfo()">
+          <option value="">Select an algorithm</option>
+          <option value="AES">AES</option>
+          <option value="DES">DES</option>
+          <option value="TripleDES">TripleDES</option>
+          <option value="Rabbit">Rabbit</option>
+          <option value="RC4">RC4</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="secretKey">Enter Secret Key:</label>
+        <input type="text" id="secretKey" placeholder="Enter your secret key" />
+      </div>
+
+      <div id="algorithmInfo">
+        <p>Select an algorithm to see its description.</p>
+      </div>
+
+      <div>
+        <button onclick="processText()">Encrypt & Hash Text</button>
+      </div>
+
+      <h3>Encrypted Text:</h3>
+      <p id="encryptedText">Not yet generated</p>
+
+      <h3>Hashed Text (SHA256):</h3>
+      <p id="hashedText">Not yet generated</p>
+
+      <div>
+        <button onclick="decryptText()">Decrypt Encrypted Text</button>
+      </div>
+
+      <h3>Decrypted Text:</h3>
+      <p id="decryptedText">Not yet decrypted</p>
+
+      <h3>Notes:</h3>
+      <p id="notes">
+        Teks yang di-hash tidak dapat dikonversi kembali ke teks asli karena
+        hashing adalah proses satu arah. Namun, teks yang dienkripsi dapat
+        didekripsi dengan kunci yang benar.
+      </p>
+    </div>
+
+    <script>
+      const algorithmDescriptions = {
+        AES: "AES (Advanced Encryption Standard) adalah algoritma enkripsi simetris yang digunakan secara luas yang mendukung ukuran kunci 128, 192, dan 256 bit. Algoritma ini dianggap sangat aman dan digunakan dalam berbagai protokol keamanan.",
+        DES: "DES (Data Encryption Standard) adalah sebuah algoritma enkripsi yang lebih tua yang menggunakan kunci 56-bit. Algoritma ini tidak lagi dianggap aman untuk sebagian besar aplikasi karena panjang kuncinya yang pendek.",
+        TripleDES:
+          "TripleDES (3DES) adalah versi DES yang lebih aman yang menerapkan proses enkripsi tiga kali dengan tiga kunci yang berbeda, memperluas ukuran kunci yang efektif menjadi 168 bit.",
+        Rabbit:
+          "Rabbit adalah algoritma stream cipher cepat yang dirancang untuk enkripsi berkecepatan tinggi. Algoritma ini efisien untuk aplikasi yang membutuhkan pemrosesan cepat, seperti enkripsi data waktu nyata.",
+        RC4: "RC4 adalah sebuah stream cipher yang dikenal karena kesederhanaan dan kecepatannya. Namun, ia memiliki kerentanan dan tidak lagi direkomendasikan untuk komunikasi yang aman.",
+      };
+
+      function updateAlgorithmInfo() {
+        const algorithm = document.getElementById("algorithm").value;
+        document.getElementById("algorithmInfo").textContent =
+          algorithmDescriptions[algorithm] ||
+          "Select an algorithm to see its description.";
+      }
+
+      function processText() {
+        const plainText = document.getElementById("plainText").value;
+        const algorithm = document.getElementById("algorithm").value;
+        const secretKey = document.getElementById("secretKey").value;
+
+        if (!secretKey) {
+          alert("Please enter a secret key for encryption.");
+          return;
+        }
+
+        let encryptedText;
+
+        if (algorithm === "AES") {
+          encryptedText = CryptoJS.AES.encrypt(plainText, secretKey).toString();
+        } else if (algorithm === "DES") {
+          encryptedText = CryptoJS.DES.encrypt(plainText, secretKey).toString();
+        } else if (algorithm === "TripleDES") {
+          encryptedText = CryptoJS.TripleDES.encrypt(
+            plainText,
+            secretKey
+          ).toString();
+        } else if (algorithm === "Rabbit") {
+          encryptedText = CryptoJS.Rabbit.encrypt(
+            plainText,
+            secretKey
+          ).toString();
+        } else if (algorithm === "RC4") {
+          encryptedText = CryptoJS.RC4.encrypt(plainText, secretKey).toString();
+        } else {
+          alert("Please select an algorithm.");
+          return;
+        }
+
+        document.getElementById("encryptedText").textContent = encryptedText;
+        const hashedText = CryptoJS.SHA256(plainText).toString();
+        document.getElementById("hashedText").textContent = hashedText;
+      }
+
+      function decryptText() {
+        const encryptedText =
+          document.getElementById("encryptedText").textContent;
+        const algorithm = document.getElementById("algorithm").value;
+        const secretKey = document.getElementById("secretKey").value;
+
+        if (!encryptedText || encryptedText === "Not yet generated") {
+          alert("No encrypted text to decrypt.");
+          return;
+        }
+
+        let decryptedText;
+
+        if (algorithm === "AES") {
+          decryptedText = CryptoJS.AES.decrypt(
+            encryptedText,
+            secretKey
+          ).toString(CryptoJS.enc.Utf8);
+        } else if (algorithm === "DES") {
+          decryptedText = CryptoJS.DES.decrypt(
+            encryptedText,
+            secretKey
+          ).toString(CryptoJS.enc.Utf8);
+        } else if (algorithm === "TripleDES") {
+          decryptedText = CryptoJS.TripleDES.decrypt(
+            encryptedText,
+            secretKey
+          ).toString(CryptoJS.enc.Utf8);
+        } else if (algorithm === "Rabbit") {
+          decryptedText = CryptoJS.Rabbit.decrypt(
+            encryptedText,
+            secretKey
+          ).toString(CryptoJS.enc.Utf8);
+        } else if (algorithm === "RC4") {
+          decryptedText = CryptoJS.RC4.decrypt(
+            encryptedText,
+            secretKey
+          ).toString(CryptoJS.enc.Utf8);
+        } else {
+          alert("Please select an algorithm.");
+          return;
+        }
+
+        document.getElementById("decryptedText").textContent =
+          decryptedText || "Decryption failed. Please check the key.";
+      }
+    </script>
+  </body>
+</html>

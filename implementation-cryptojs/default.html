@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Hashing and Diff Checker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .diff {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        .added {
+            color: green;
+        }
+        .removed {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>File Hashing and Diff Checker</h1>
+
+        <div>
+            <label for="fileInput">Upload File:</label>
+            <input type="file" id="fileInput" accept=".txt">
+        </div>
+
+        <div>
+            <button onclick="processFile()">Generate Hash & Modify File</button>
+        </div>
+
+        <h3>Original Hash:</h3>
+        <p id="originalHash">Not yet generated</p>
+
+        <h3>Modified Hash:</h3>
+        <p id="modifiedHash">Not yet generated</p>
+
+        <h3>Diff:</h3>
+        <pre class="diff" id="diffResult">No changes detected</pre>
+    </div>
+
+    <script>
+        let originalContent = '';
+        let originalHash = '';
+
+        function processFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please upload a file first!");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                // Get the content of the file
+                originalContent = event.target.result;
+                
+                // Generate original hash using CryptoJS
+                originalHash = CryptoJS.SHA256(originalContent).toString();
+                document.getElementById('originalHash').textContent = originalHash;
+
+                // Simulate file modification
+                const modifiedContent = originalContent + '\nData tambahan.';
+                
+                // Generate modified hash
+                const modifiedHash = CryptoJS.SHA256(modifiedContent).toString();
+                document.getElementById('modifiedHash').textContent = modifiedHash;
+
+                // Compare hashes and generate diff
+                if (originalHash === modifiedHash) {
+                    document.getElementById('diffResult').textContent = "File tidak berubah";
+                } else {
+                    const diff = generateDiff(originalContent, modifiedContent);
+                    document.getElementById('diffResult').innerHTML = diff;
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        function generateDiff(original, modified) {
+            const originalLines = original.split('\n');
+            const modifiedLines = modified.split('\n');
+            let diffResult = '';
+
+            originalLines.forEach((line, index) => {
+                if (line !== modifiedLines[index]) {
+                    if (!modifiedLines[index]) {
+                        diffResult += `<span class="removed">- ${line}</span>\n`;
+                    } else {
+                        diffResult += `<span class="added">+ ${modifiedLines[index]}</span>\n`;
+                    }
+                } else {
+                    diffResult += `  ${line}\n`;
+                }
+            });
+
+            return diffResult;
+        }
+    </script>
+</body>
+</html>
