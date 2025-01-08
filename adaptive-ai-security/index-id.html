@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Adaptive AI Security Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+      }
+      header {
+        background-color: #007bff;
+        color: white;
+        padding: 1rem 2rem;
+        text-align: center;
+      }
+      main {
+        padding: 2rem;
+      }
+      .container {
+        display: flex;
+        justify-content: space-between;
+        gap: 2rem;
+      }
+      .card {
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1.5rem;
+        flex: 1;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .card h2 {
+        margin-top: 0;
+        color: #007bff;
+      }
+      .logs {
+        max-height: 300px;
+        overflow-y: auto;
+        background: #f9f9f9;
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .button {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 0.9rem 0;
+      }
+      .button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+      .button:hover:enabled {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Adaptive AI Security Dashboard</h1>
+    </header>
+    <main>
+      <div class="container">
+        <!-- Deteksi Ancaman -->
+        <div class="card">
+          <h2>Deteksi Ancaman</h2>
+          <p id="detectionStatus">Deteksi keamanan yang ada:</p>
+          <div class="logs" id="threatLogs">
+            <p id="threatLogsParagraph">Belum ada ancaman terdeteksi...</p>
+          </div>
+          <button
+            class="button"
+            id="simulateThreatButton"
+            onclick="simulateThreat()"
+          >
+            Simulasi Ancaman
+          </button>
+        </div>
+
+        <!-- Penilaian Risiko -->
+        <div class="card">
+          <h2>Penilaian Risiko</h2>
+          <p>Menilai tingkat risiko menggunakan model DREAD:</p>
+          <ul id="riskLevels">
+            <li>Damage: 0</li>
+            <li>Reproducibility: 0</li>
+            <li>Exploitability: 0</li>
+            <li>Affected Users: 0</li>
+            <li>Discoverability: 0</li>
+          </ul>
+          <p id="totalRisk">Total Risiko: 0 (Klasifikasi: -)</p>
+
+          <button class="button" id="simulateRiskButton" onclick="assessRisk()">
+            Nilai Risiko
+          </button>
+        </div>
+
+        <!-- Mitigasi -->
+        <div class="card">
+          <h2>Mitigasi</h2>
+          <p>Ambil tindakan segera untuk mengamankan sistem.</p>
+          <button
+            class="button"
+            id="simulateMitigationButton"
+            onclick="applyMitigation()"
+          >
+            Terapkan Mitigasi
+          </button>
+          <div id="mitigationStatus">Belum ada tindakan yang diambil.</div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      totalDreadScore = 0; // Reset sebelum menghitung ulang
+
+      function simulateThreat() {
+        const log = document.getElementById("threatLogs");
+        const threats = [
+          "Penyamaran: Penyerang menyamar sebagai pengguna sah.",
+          "Penyamaran: Penyerang mencoba login sebagai admin.",
+          "Pemalsuan: Manipulasi harga produk sebelum checkout.",
+          "Pemalsuan: Perubahan data transaksi di sisi klien.",
+          "Pengungkapan: Kebocoran data kartu kredit melalui API.",
+          "Pengungkapan: Data login terekspos karena konfigurasi server salah.",
+          "Penolakan: Pengguna menyangkal melakukan transaksi.",
+          "Penolakan: Serangan replay membatalkan transaksi.",
+          "Penolakan Layanan: Serangan DoS membuat server tidak merespons.",
+          "Penolakan Layanan: Membanjiri API dengan permintaan palsu.",
+          "Eskalasi Privilege: Penyerang mendapatkan akses admin.",
+          "Eskalasi Privilege: Eksploitasi token sesi untuk akses penuh.",
+        ];
+        const randomThreat =
+          threats[Math.floor(Math.random() * threats.length)];
+
+        // Buat elemen baru untuk ancaman
+        const newThreat = document.getElementById("threatLogsParagraph");
+        newThreat.textContent = `Ancaman terdeteksi: ${randomThreat} pada ${new Date().toLocaleTimeString()}`;
+
+        // Tambahkan ancaman baru ke log
+        log.appendChild(newThreat);
+
+        // Update detection status
+        document.getElementById("detectionStatus").textContent =
+          "Ancaman keamanan telah terdeteksi.";
+
+        // Disable threat simulation button
+        document.getElementById("simulateThreatButton").disabled = true;
+      }
+
+      function assessRisk() {
+        const threatLogs = document
+          .getElementById("threatLogs")
+          .innerText.trim();
+
+        // Cek apakah log ancaman memiliki teks
+        if (
+          threatLogs === "" ||
+          threatLogs === "Belum ada ancaman terdeteksi..."
+        ) {
+          alert(
+            "Tidak ada ancaman yang terdeteksi. Silakan simulasi ancaman terlebih dahulu."
+          );
+          return;
+        }
+
+        const riskLevels = document.getElementById("riskLevels").children;
+        const scores = [
+          Math.floor(Math.random() * 10) + 1, // Damage
+          Math.floor(Math.random() * 10) + 1, // Reproducibility
+          Math.floor(Math.random() * 10) + 1, // Exploitability
+          Math.floor(Math.random() * 10) + 1, // Affected Users
+          Math.floor(Math.random() * 10) + 1, // Discoverability
+        ];
+
+        totalDreadScore = 0; // Reset sebelum menghitung ulang
+        Array.from(riskLevels).forEach((item, index) => {
+          item.textContent =
+            item.textContent.split(":")[0] + `: ${scores[index]}`;
+          totalDreadScore += scores[index]; // Tambahkan setiap nilai ke total
+        });
+
+        let classification = "-";
+        if (totalDreadScore <= 20) {
+          classification = "Ringan";
+        } else if (totalDreadScore <= 30) {
+          classification = "Sedang";
+        } else if (totalDreadScore <= 40) {
+          classification = "Tinggi";
+        } else {
+          classification = "Kritis";
+        }
+
+        alert("Penilaian risiko selesai. Total skor risiko dihitung.");
+        document.getElementById(
+          "totalRisk"
+        ).textContent = `Total Risiko: ${totalDreadScore} (Klasifikasi: ${classification})`;
+      }
+
+      function applyMitigation() {
+        const mitigationStatus = document.getElementById("mitigationStatus");
+        const threatLogs = document.getElementById("threatLogs").innerText;
+
+        let solution;
+        if (threatLogs.includes("Penyamaran")) {
+          solution = classifyMitigation(totalDreadScore, [
+            "Terapkan autentikasi dua faktor (2FA)",
+            "Gunakan mekanisme CAPTCHA",
+            "Enkripsi komunikasi dengan TLS",
+            "Audit dan monitor aktivitas mencurigakan",
+          ]);
+        } else if (threatLogs.includes("Pemalsuan")) {
+          solution = classifyMitigation(totalDreadScore, [
+            "Validasi input di sisi server",
+            "Gunakan tanda tangan digital pada data transaksi",
+            "Terapkan logging audit",
+            "Gunakan token CSRF untuk mencegah serangan",
+          ]);
+        } else if (threatLogs.includes("Pengungkapan")) {
+          solution = classifyMitigation(totalDreadScore, [
+            "Enkripsi data sensitif menggunakan AES",
+            "Terapkan kebijakan least privilege",
+            "Audit keamanan API secara rutin",
+            "Gunakan tokenisasi pada data kartu kredit",
+          ]);
+        } else if (threatLogs.includes("Penolakan")) {
+          solution = classifyMitigation(totalDreadScore, [
+            "Simpan log transaksi dengan hashing",
+            "Gunakan tanda tangan digital untuk setiap transaksi",
+            "Terapkan timestamp pada transaksi",
+            "Gunakan mekanisme blockchain untuk validasi",
+          ]);
+        } else if (threatLogs.includes("Penolakan Layanan")) {
+          solution = classifyMitigation(totalDreadScore, [
+            "Terapkan rate-limiting pada API",
+            "Gunakan firewall aplikasi web (WAF)",
+            "Distribusikan beban dengan CDN",
+            "Gunakan sistem deteksi anomali berbasis AI",
+          ]);
+        } else if (threatLogs.includes("Eskalasi Privilege")) {
+          solution = classifyMitigation(totalDreadScore, [
+            "Terapkan otorisasi berbasis peran (RBAC)",
+            "Audit aktivitas admin secara berkala",
+            "Terapkan pembaruan keamanan perangkat lunak",
+            "Gunakan IDS/IPS untuk deteksi eskalasi",
+          ]);
+        } else {
+          solution = "Tidak ada ancaman yang memerlukan mitigasi saat ini.";
+        }
+
+        mitigationStatus.textContent = `Mitigasi diterapkan:\n${solution}`;
+        alert(`Mitigasi berhasil diterapkan:\n${solution}`);
+
+        document.getElementById("simulateMitigationButton").disabled = true;
+
+        // Re-enable the simulation button
+        document.getElementById("detectionStatus").textContent =
+          "Deteksi keamanan yang ada:";
+
+        document.getElementById("simulateThreatButton").disabled = false;
+        document.getElementById("simulateRiskButton").disabled = false;
+        document.getElementById("simulateMitigationButton").disabled = false;
+      }
+
+      function classifyMitigation(dreadScore, solutions) {
+        if (dreadScore <= 20) return `Ringan: ${solutions[0]}`;
+        if (dreadScore <= 30) return `Sedang: ${solutions[1]}`;
+        if (dreadScore <= 40) return `Tinggi: ${solutions[2]}`;
+        return `Kritis: ${solutions[3]}`;
+      }
+    </script>
+  </body>
+</html>

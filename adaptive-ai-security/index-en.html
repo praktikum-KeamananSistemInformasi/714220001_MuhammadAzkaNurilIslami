@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adaptive AI Security Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+        main {
+            padding: 2rem;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        .card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            flex: 1;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .logs {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Adaptive AI Security Dashboard</h1>
+    </header>
+    <main>
+        <div class="container">
+            <!-- Threat Detection -->
+            <div class="card">
+                <h2>Threat Detection</h2>
+                <p>Monitor live threats detected in the system.</p>
+                <div class="logs" id="threatLogs">
+                    <p>No threats detected yet...</p>
+                </div>
+                <button class="button" onclick="simulateThreat()">Simulate Threat</button>
+            </div>
+
+            <!-- Risk Assessment -->
+            <div class="card">
+                <h2>Risk Assessment</h2>
+                <p>Assess risk levels using DREAD model:</p>
+                <ul id="riskLevels">
+                    <li>Damage: 0</li>
+                    <li>Reproducibility: 0</li>
+                    <li>Exploitability: 0</li>
+                    <li>Affected Users: 0</li>
+                    <li>Discoverability: 0</li>
+                </ul>
+                <button class="button" onclick="assessRisk()">Assess Risk</button>
+            </div>
+
+            <!-- Mitigation -->
+            <div class="card">
+                <h2>Mitigation</h2>
+                <p>Take immediate actions to secure the system.</p>
+                <button class="button" onclick="applyMitigation()">Apply Mitigation</button>
+                <div id="mitigationStatus">No actions taken yet.</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function simulateThreat() {
+            const log = document.getElementById('threatLogs');
+            const newThreat = document.createElement('p');
+            newThreat.textContent = `Threat detected: Unauthorized API access at ${new Date().toLocaleTimeString()}`;
+            log.appendChild(newThreat);
+        }
+
+        function assessRisk() {
+            const riskLevels = document.getElementById('riskLevels').children;
+            const scores = [8, 7, 6, 9, 8]; // Example DREAD scores
+
+            Array.from(riskLevels).forEach((item, index) => {
+                item.textContent = item.textContent.split(':')[0] + `: ${scores[index]}`;
+            });
+            alert('Risk assessment completed. Total risk score calculated.');
+        }
+
+        function applyMitigation() {
+            const mitigationStatus = document.getElementById('mitigationStatus');
+            mitigationStatus.textContent = 'Mitigation applied: Unauthorized API access blocked. Logs updated.';
+            alert('Mitigation successfully applied!');
+        }
+    </script>
+</body>
+</html>
